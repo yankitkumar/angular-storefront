@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="formApp">
+<head>
+  <meta charset="utf-8" />
+  <title>AngularJS Form</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 420px; margin: 3rem auto; }
+    label { display: block; margin-top: 0.75rem; font-weight: 600; }
+    input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
+    .error { color: #c0392b; font-size: 0.85rem; }
+    .success { color: #1e8449; }
+    button { margin-top: 1rem; padding: 0.6rem 1rem; }
+    /* AngularJS adds these classes automatically based on field state */
+    input.ng-invalid.ng-touched { border: 2px solid #c0392b; }
+  </style>
+</head>
+<body>
+  <!-- ng-controller attaches the controller; $scope is shared with this element -->
+  <div ng-controller="FormController">
+    <h2>Contact us</h2>
+
+    <!-- name="contactForm" exposes form state as $scope.contactForm -->
+    <form name="contactForm" ng-submit="submit()" novalidate>
+      <label>Name</label>
+      <!-- ng-model = two-way binding between the input and user.name -->
+      <input name="name" ng-model="user.name" required />
+      <div class="error" ng-show="contactForm.name.$touched && contactForm.name.$error.required">Name is required.</div>
+
+      <label>Email</label>
+      <input name="email" type="email" ng-model="user.email" required />
+      <div class="error" ng-show="contactForm.email.$touched && contactForm.email.$invalid">Enter a valid email.</div>
+
+      <label>Message (min 10 characters)</label>
+      <input name="message" ng-model="user.message" ng-minlength="10" required />
+      <div class="error" ng-show="contactForm.message.$touched && contactForm.message.$invalid">Message must be at least 10 characters.</div>
+
+      <button type="submit" ng-disabled="contactForm.$invalid">Send</button>
+    </form>
+
+    <!-- Live preview shows two-way binding in action -->
+    <p><small>Live preview: {{ user.name }} &lt;{{ user.email }}&gt;</small></p>
+
+    <p class="success" ng-if="submitted">Thanks, {{ submitted.name }}! We got your message.</p>
+  </div>
+
+  <script>
+    // Module = container for the app; name matches ng-app above.
+    angular.module('formApp', [])
+      .controller('FormController', function ($scope) {
+        $scope.user = {};
+        $scope.submitted = null;
+
+        $scope.submit = function () {
+          if ($scope.contactForm.$invalid) return;
+          $scope.submitted = angular.copy($scope.user); // copy so later edits don't change it
+          $scope.user = {};
+          $scope.contactForm.$setPristine();
+          $scope.contactForm.$setUntouched();
+        };
+      });
+  </script>
+</body>
+</html>
